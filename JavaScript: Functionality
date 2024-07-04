@@ -1,0 +1,72 @@
+let startTime;
+let updatedTime;
+let difference;
+let timerInterval;
+let running = false;
+let laps = [];
+
+const display = document.getElementById('display');
+const startStopBtn = document.getElementById('startStopBtn');
+const resetBtn = document.getElementById('resetBtn');
+const lapBtn = document.getElementById('lapBtn');
+const lapsContainer = document.getElementById('laps');
+
+function startStopwatch() {
+    startTime = new Date().getTime();
+    timerInterval = setInterval(showTime, 1);
+    startStopBtn.textContent = 'Pause';
+}
+
+function stopStopwatch() {
+    clearInterval(timerInterval);
+    running = false;
+    startStopBtn.textContent = 'Start';
+}
+
+function resetStopwatch() {
+    clearInterval(timerInterval);
+    display.textContent = '00:00:00.000';
+    running = false;
+    startStopBtn.textContent = 'Start';
+    laps = [];
+    updateLaps();
+}
+
+function lapStopwatch() {
+    if (running) {
+        laps.push(display.textContent);
+        updateLaps();
+    }
+}
+
+function updateLaps() {
+    lapsContainer.innerHTML = '';
+    laps.forEach((lap, index) => {
+        const lapElement = document.createElement('li');
+        lapElement.textContent = `Lap ${index + 1}: ${lap}`;
+        lapsContainer.appendChild(lapElement);
+    });
+}
+
+function showTime() {
+    updatedTime = new Date().getTime();
+    difference = updatedTime - startTime;
+    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+    const milliseconds = Math.floor((difference % 1000));
+    
+    display.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
+}
+
+startStopBtn.addEventListener('click', () => {
+    if (running) {
+        stopStopwatch();
+    } else {
+        running = true;
+        startStopwatch();
+    }
+});
+
+resetBtn.addEventListener('click', resetStopwatch);
+lapBtn.addEventListener('click', lapStopwatch);
